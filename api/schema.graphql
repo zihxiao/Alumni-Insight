@@ -1,0 +1,229 @@
+scalar GraphQLDate
+
+enum StateType {
+  AL
+  AK
+  AS
+  AZ
+  AR
+  CA
+  CO
+  CT
+  DC
+  DE
+  FL
+  FM
+  GA
+  GU
+  HI
+	ID
+	IL
+	IN
+	IA
+	KS
+	KY
+	LA
+	ME
+	MD
+  MP
+	MA
+  MH
+	MI
+	MN
+	MS
+	MO
+	MT
+	NE
+	NV
+	NH
+	NJ
+	NM
+	NY
+	NC
+	ND
+	OH
+	OK
+	OR
+	PA
+  PR
+  PW
+	RI
+	SC
+	SD
+	TN
+	TX
+	UT
+	VT
+	VA
+  VI
+	WA
+	WV
+	WI
+	WY
+  Unknown
+}
+
+type School {
+  _id: ID!
+  id: Int!
+  name: String!
+  address: String
+  state: StateType
+  zip: String
+  website: String
+}
+
+type User {
+  _id: ID!
+  id: Int!
+  username: String!
+  address: String
+  city: String
+  zip: String
+  email: String
+  school: String
+  token: String
+  password: String
+  schoolID: Int
+  firstname: String
+  lastname: String
+  country: String
+}
+
+type Comment {
+  _id: ID!
+  id: Int
+  schoolID: Int
+  content: String
+  rating: Float
+  userID: Int
+}
+
+type SchoolListWithPage {
+  schools: [School!]!
+  pages: Int
+}
+
+type SchoolListWithPage2 {
+  schools: [School!]!
+}
+
+
+"Tone down Issue, used as inputs, without server generated values."
+input SchoolInputs{
+  name: String!
+  "Optional, if not specified, will be set to 'New'"
+  address: String
+  state: StateType
+  zip: String
+  website: String
+}
+
+input CommentInputs{
+  userID: Int!
+  schoolID: Int!
+  content: String
+  rating: Float
+}
+
+input UserInputs{
+  username: String!
+  address: String
+  city: String
+  zip: String
+  password: String
+  school: String
+}
+
+
+
+input RegisterInputs{
+  username: String!
+  password: String!
+  confirmPassword: String!
+  email: String!
+  school: String!
+  schoolID: Int!
+  address: String
+  zip: String
+  city: String
+}
+
+"""Inputs for issueUpdate: all are optional. Whichever is specified will
+be set to the given value, undefined fields will remain unmodified."""
+ 
+input UserUpdateInputs {
+  username: String!
+  password: String
+  address: String
+  email: String
+  zip: String
+  city: String
+  school: String
+  token: String
+  firstname: String
+  lastname: String
+  country: String
+  signIn: Boolean
+  schoolID: Int
+}
+
+
+input SchoolUpdateInputs {
+  name: String
+  address: String
+  state: StateType
+  zip: String
+  website: String
+  rating: Float
+}
+
+input CommentUpdateInputs {
+  content: String
+  rating: Float
+  schoolID: Int
+  userID: Int
+}
+
+
+### Top level declarations
+type Query{
+  about: String!
+  user: User!
+  schoolList(
+    state: StateType
+    ratingMin: Int
+    ratingMax: Int
+    zip: String
+    rating: Float
+    search: String
+    page: Int = 1
+  ): SchoolListWithPage
+  schoolList2(
+    state: StateType
+    zip: String
+    rating: Float
+    search: String
+  ): SchoolListWithPage2
+  school(id: Int!): School!
+  user1(id: Int!): User!
+  comment(id: Int!): Comment!
+  users(schoolID: Int):[User!]!
+  comments(
+    schoolID: Int
+    userID: Int
+  ):[Comment!]!
+}
+
+type Mutation {
+  setAboutMessage(message: String!): String
+  schoolAdd(school: SchoolInputs!): School!
+  schoolUpdate(id: Int!, changes: SchoolUpdateInputs!): School!
+  schoolDelete(id: Int!): Boolean!
+  userUpdate(id: Int!, changes2: UserUpdateInputs!): User!
+  userDelete(id: Int!) : Boolean!
+  register(registerInputs: RegisterInputs!): User!
+  login(username: String!, password: String!): User!
+  commentAdd(comment: CommentInputs!): Comment!
+  commentUpdate(id: Int!, changes1: CommentUpdateInputs!): Comment!
+}
